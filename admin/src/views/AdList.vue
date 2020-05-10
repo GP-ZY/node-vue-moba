@@ -11,7 +11,7 @@
             size="small"
             @click="$router.push(`/ads/edit/${scope.row._id}`)"
           >编辑</el-button>
-          <el-button type="primary" size="small" @click="remove(scope.row)">删除</el-button>
+          <el-button type="danger" size="small" @click="remove(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
