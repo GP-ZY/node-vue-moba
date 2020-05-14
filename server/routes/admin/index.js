@@ -1,5 +1,8 @@
 module.exports = app => {
   const express = require('express')
+  const jwt = require('jsonwebtoken')
+  const assert = require('http-assert')
+  const AdminUser = require('../../models/AdminUser')
   const router = express.Router({
     mergeParams: true
   })
@@ -18,8 +21,20 @@ module.exports = app => {
   })
 
   //分类列表接口
-  router.get('/', async (req, res) => {
-    const items = await req.Model.find().populate('parent').limit(10)
+  router.get('/', async (req, res, next) => {
+    const token = String(req.headers.authorization || '').split(' ').pop()
+    assert(token, 401, '请先登录')
+    const { id } = jwt.verify(token, app.get('secret'))
+    assert(id, 401, '请先登录')
+    req.user = await AdminUser.findById(id)
+    assert(req.user, 401, '请先登录')
+    await next()
+  }, async (req, res) => {
+    const queryOptions = {}
+    if (req.Model.modelName === 'Category') {
+      queryOptions.populate = 'parent'
+    }
+    const items = await req.Model.find().setOptions(queryOptions).limit(10)
     res.send(items)
   })
 
@@ -40,15 +55,11 @@ module.exports = app => {
   app.use('/admin/api/rest/:resource', async (req, res, next) => {
     // 将前台获取的名称转化
     const modelName = require('inflection').classify(req.params.resource)
-
     req.Model = require(`../../models/${modelName}`)
-
     next()
-
   }, router)
 
   const multer = require('multer')
-
   const upload = multer({ dest: __dirname + '/../../uploads' })
 
   // 上传图片接口
@@ -62,26 +73,31 @@ module.exports = app => {
   app.post('/admin/api/login', async (req, res) => {
     const { username, password } = req.body
     // 1.根据用户名找用户
-    const AdminUser = require('../../models/AdminUser')
-
-    const user = await AdminUser.findOne({username}).select('+password')
-
-    if (!user) {
-      return res.status(422).send({
-        message: '用户不存在'
-      })
-    }
+    const user = await AdminUser.findOne({ username }).select('+password')
+    assert(user, 422, '用户不存在')
+    // if (!user) {
+    //   return res.status(422).send({
+    //     message: '用户不存在'
+    //   })
+    // }
     // 2.校验密码    compareSync 比较散列密码的明文和暗文
     const isValid = require('bcrypt').compareSync(password, user.password)
-    if (!isValid) {
-      return res.status(422).send({
-        message: '密码不正确'
-      })
-    }
+    assert(isValid, 422, '密码不正确')
+    // if (!isValid) {
+    //   return res.status(422).send({
+    //     message: '密码不正确'
+    //   })
+    // }
     // 3.返回token
-    const jwt = require('jsonwebtoken')
     const token = jwt.sign({ id: user._id }, app.get('secret'))
-    res.send({token})
+    res.send({ token })
 
+  })
+
+  // 错误处理函数
+  app.use(async (err,req,res,next) => {
+    res.status(err.statusCode || 500).send({
+      message: err.message
+    })
   })
 }

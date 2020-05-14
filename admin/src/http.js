@@ -1,10 +1,22 @@
 import axios from 'axios'
 import Vue from 'vue'
+import router from './router/index'
 
 const http = axios.create({
   baseURL: 'http://localhost:3000/admin/api'
 })
 
+// 登录发送请求头
+http.interceptors.request.use(config => {
+  if (localStorage.token){
+    config.headers.Authorization = 'Bearer ' + localStorage.token
+  }
+  return config
+}, err => {
+  return Promise.reject(err)
+})
+
+// 登录验证，全局返回
 http.interceptors.response.use(res => {
   return res
 }, err => {
@@ -13,6 +25,10 @@ http.interceptors.response.use(res => {
       type: 'error',
       message: err.response.data.message
     })
+  }
+
+  if (err.response.status === 401) {
+    router.push('/login')
   }
   return Promise.reject(err)
 }
