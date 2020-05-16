@@ -20,7 +20,8 @@
               <el-upload
                 class="avatar-uploader"
                 accept="image/*"
-                :action="$http.defaults.baseURL + '/upload'"
+                :action="uploadUrl"
+                :headers="getAuthHeaders()"
                 :show-file-list="false"
                 :on-success="res => $set(item, 'image', res.url)"
               >

@@ -13,6 +13,23 @@ import http from './http'
 
 Vue.prototype.$http = http
 
+// 全局mixin，代码块，可以让每个vue实例都拥有
+Vue.mixin({
+  computed: {
+    uploadUrl() {
+      return this.$http.defaults.baseURL + '/upload'
+    }
+  },
+  methods: {
+    getAuthHeaders() {
+      return {
+        Authorization: `Bearer ${localStorage.token || ''}`
+      }
+    }
+  },
+})
+
+
 Vue.use(ElementUI)
 
 new Vue({

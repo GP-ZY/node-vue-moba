@@ -8,28 +8,20 @@ module.exports = app => {
   })
   // const Category = require('../../models/Category')
 
-  //编辑分类接口
+  // 新建资源接口
   router.post('/', async (req, res) => {
     const model = await req.Model.create(req.body)
     res.send(model)
   })
 
-  //更新分类接口
+  // 更新资源接口
   router.put('/:id', async (req, res) => {
     const model = await req.Model.findByIdAndUpdate(req.params.id, req.body)
     res.send(model)
   })
 
-  //分类列表接口
-  router.get('/', async (req, res, next) => {
-    const token = String(req.headers.authorization || '').split(' ').pop()
-    assert(token, 401, '请先登录')
-    const { id } = jwt.verify(token, app.get('secret'))
-    assert(id, 401, '请先登录')
-    req.user = await AdminUser.findById(id)
-    assert(req.user, 401, '请先登录')
-    await next()
-  }, async (req, res) => {
+  // 资源列表接口
+  router.get('/', async (req, res) => {
     const queryOptions = {}
     if (req.Model.modelName === 'Category') {
       queryOptions.populate = 'parent'
@@ -38,13 +30,13 @@ module.exports = app => {
     res.send(items)
   })
 
-  //编辑详情接口
+  // 编辑详情接口
   router.get('/:id', async (req, res) => {
     const model = await req.Model.findById(req.params.id)
     res.send(model)
   })
 
-  //删除详情接口
+  // 删除详情接口
   router.delete('/:id', async (req, res) => {
     await req.Model.findByIdAndDelete(req.params.id, req.body)
     res.send({
@@ -52,18 +44,18 @@ module.exports = app => {
     })
   })
 
-  app.use('/admin/api/rest/:resource', async (req, res, next) => {
-    // 将前台获取的名称转化
-    const modelName = require('inflection').classify(req.params.resource)
-    req.Model = require(`../../models/${modelName}`)
-    next()
-  }, router)
+  // 登录校验中间件
+  const authMiddleware = require('../../middleware/auth')
+
+  const resourceMiddleware = require('../../middleware/resource')
+
+  app.use('/admin/api/rest/:resource', authMiddleware(), resourceMiddleware(), router)
 
   const multer = require('multer')
   const upload = multer({ dest: __dirname + '/../../uploads' })
 
   // 上传图片接口
-  app.post('/admin/api/upload', upload.single('file'), async (req, res) => {
+  app.post('/admin/api/upload', authMiddleware(), upload.single('file'), async (req, res) => {
     const file = req.file
     file.url = `http://localhost:3000/uploads/${file.filename}`
     res.send(file)
@@ -95,7 +87,7 @@ module.exports = app => {
   })
 
   // 错误处理函数
-  app.use(async (err,req,res,next) => {
+  app.use(async (err, req, res, next) => {
     res.status(err.statusCode || 500).send({
       message: err.message
     })
