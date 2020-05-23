@@ -68,16 +68,16 @@ const routes = [
 
       // 英雄界面路由
       {
-        path: '/heros/create',
+        path: '/heroes/create',
         component: HeroEdit
       },
       {
-        path: '/heros/edit/:id',
+        path: '/heroes/edit/:id',
         component: HeroEdit,
         props: true
       },
       {
-        path: '/heros/list',
+        path: '/heroes/list',
         component: HeroList
       },
 
