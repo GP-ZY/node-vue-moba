@@ -1,7 +1,7 @@
 <template>
   <div class="about">
     <h1>英雄列表</h1>
-    <el-table :data="heros">
+    <el-table :data="heroes">
       <el-table-column prop="_id" label="ID" width="260"></el-table-column>
       <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column prop="title" label="称号"></el-table-column>
@@ -28,7 +28,7 @@
 export default {
   data() {
     return {
-      heros: []
+      heroes: []
     };
   },
 
