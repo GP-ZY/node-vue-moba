@@ -5,4 +5,8 @@ module.exports = app => {
     useNewUrlParser: true,
     useUnifiedTopology: true 
   })
+
+  require('require-all')(__dirname + '/../models')
+
+  
 }

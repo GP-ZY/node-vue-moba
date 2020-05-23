@@ -35,7 +35,6 @@ export default {
   methods: {
     async fetch() {
       const res = await this.$http.get("rest/heros");
-      console.log(res.data);
       this.heros = res.data;
     },
 
