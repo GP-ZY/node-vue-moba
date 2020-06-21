@@ -10,23 +10,27 @@
   "dependencies": {
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
-    "dayjs": "^1.8.27",
-    "swiper": "^5.4.0",
+    "dayjs": "^1.8.28",
+    "swiper": "^5.4.5",
     "vue": "^2.6.11",
     "vue-awesome-swiper": "^4.1.1",
-    "vue-router": "^3.1.6"
+    "vue-router": "^3.3.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
     "@vue/cli-plugin-babel": "~4.2.0",
     "@vue/cli-plugin-eslint": "~4.2.0",
     "@vue/cli-plugin-router": "^4.3.1",
     "@vue/cli-service": "~4.2.0",
     "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.1.2",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.43.0"
   },
   "eslintConfig": {
     "root": true,
